@@ -25,7 +25,7 @@
                 <li>First Name</li>
               </ul>
             </div>
-            <input type="text" class="info-input" placeholder="{{ account.firstName }}" />
+            <input type="text" class="info-input" value="{{ account.firstName }}" />
           </div>
 
           <div class="outer-info-segment">
@@ -34,7 +34,7 @@
                 <li>Last Name</li>
               </ul>
             </div>
-            <input type="text" class="info-input" placeholder="{{ account.lastName }}" />
+            <input type="text" class="info-input" value="{{ account.lastName }}" />
           </div>
 
           <div class="outer-info-segment">
@@ -46,7 +46,7 @@
             <input
               type="email"
               class="info-input"
-              placeholder="{{ account.email }}"
+              value="{{ account.email }}"
             />
           </div>
 
@@ -59,7 +59,7 @@
             <input
               type="text"
               class="info-input"
-              placeholder="{{ account.address.street }} {{ account.address.number }}, {{ account.address.city }}"
+              value="{{ account.address.street }} {{ account.address.number }}, {{ account.address.city }}"
             />
           </div>
 
@@ -69,7 +69,7 @@
                 <li>Country</li>
               </ul>
             </div>
-            <input type="text" class="info-input" placeholder="{{ account.country }}" />
+            <input type="text" class="info-input" value="{{ account.country }}" />
           </div>
 
           <div class="outer-info-segment">
@@ -78,7 +78,7 @@
                 <li>Phone</li>
               </ul>
             </div>
-            <input type="text" class="info-input" placeholder="{{ account.phone }}" />
+            <input type="text" class="info-input" value="{{ account.phone }}" />
           </div>
           <div class="button-actions">
             <button pButton type="button" class="apply-button">Apply changes</button>
