@@ -28,8 +28,6 @@
 
 .section-info-text {
   color: #3a3d40;
-  flex-grow: 1;
-  flex-basis: auto;
   font: 700 40px/24px Poppins, sans-serif;
 }
 .outer-main-section {
@@ -254,4 +252,9 @@
   .change-pass-button {
     margin: 40px 0;
   }
+}
+
+
+.pi-user-edit {
+  font-size: 2.5em;
 }

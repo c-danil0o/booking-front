@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import guestAccount from '../account-data.json'
-import { Guest } from '../../model/guest-model';
+import { AccountService } from '../services/account.service';
+import { Account } from '../../model/account-model';
+import { Address } from 'src/app/model/address-model';
 
 @Component({
   selector: 'app-edit-account',
@@ -9,5 +9,31 @@ import { Guest } from '../../model/guest-model';
   styleUrls: ['./edit-account.component.css']
 })
 export class EditAccountComponent {
-  account = guestAccount;
+  account: any;
+
+  constructor(private AccountService: AccountService) {  }
+
+  ngOnInit() {
+    this.getAccountData();
+  }
+
+  getAccountData() {
+    this.AccountService.getAccountData().subscribe((data: any) => {
+      this.account = data;
+    });
+  }
+
+  onSubmit() {
+    this.AccountService.updateAccountData(this.account).subscribe((response: any) => {
+      console.log(this.account.role);
+      this.getAccountData();
+    });
+  }
+
+  onCancel() {
+    this.getAccountData();
+  };
+
+  onDelete() {
+  };
 }
