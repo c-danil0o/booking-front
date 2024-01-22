@@ -1,11 +1,9 @@
 import { AccommodationService } from './accommodation.service';
 import {HttpClientTestingModule, HttpTestingController} from "@angular/common/http/testing";
 import {TestBed} from "@angular/core/testing";
-// @ts-ignore
 import {mockAvailabilityPrice} from "../mocks/getAvailabilityPrice.mock";
 import {environment} from "../../env/env";
 import {mockReservation1} from "../mocks/reservation.service.mock";
-// @ts-ignore
 import {mockGottenAvailabilityPrice} from "../mocks/getAvailabilityPrice.mock";
 
 describe('AccommodationService', () => {

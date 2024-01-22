@@ -17,6 +17,7 @@ import {Host} from "../../model/host-model";
 import {GottenAvailabilityPrice} from "../../model/gotten-availability-price-model";
 import {of} from "rxjs";
 import {mockAccommodation} from "../../mocks/accommodation.mock";
+import {mockGottenAvailabilityPrice} from "../../mocks/getAvailabilityPrice.mock";
 
 
 describe('AccommodationPageComponent', () => {
@@ -25,9 +26,8 @@ describe('AccommodationPageComponent', () => {
   let reserveButton: HTMLElement;
 
   beforeEach(() => {
-    const dataPrice: GottenAvailabilityPrice = {available: true, totalPrice: 900, pricePerNight: 300};
     const accommodationServiceSpy = jasmine.createSpyObj<AccommodationService>(['checkAvailabilityAndPrice']);
-    accommodationServiceSpy.checkAvailabilityAndPrice.and.returnValue(of(dataPrice));
+    accommodationServiceSpy.checkAvailabilityAndPrice.and.returnValue(of(mockGottenAvailabilityPrice));
     TestBed.configureTestingModule({
       declarations: [AccommodationDetailsComponent],
       imports: [

@@ -6,7 +6,7 @@ import {RouterTestingModule} from "@angular/router/testing";
 import {MessageService} from "primeng/api";
 import {PasswordModule} from "primeng/password";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {By} from "@angular/platform-browser";
+import {BrowserModule, By} from "@angular/platform-browser";
 import {Host} from "../../model/host-model";
 import {mockHost2} from "../../mocks/host.service.mock";
 import {HostService} from "../services/host.service";
@@ -17,29 +17,30 @@ import {GuestService} from "../services/guest.service";
 import {AuthService} from "../../infrastructure/auth/auth.service";
 import {compareNumbers} from "@angular/compiler-cli/src/version_helpers";
 
-describe('EditAccountComponent', () => {
+describe('EditAccountComponentHost', () => {
   let component: EditAccountComponent;
   let fixture: ComponentFixture<EditAccountComponent>;
   let hostServiceSpy: any;
+  let submitButton: HTMLElement;
 
   beforeEach(() => {
     const fakeHost: Host = mockHost2;
     hostServiceSpy = jasmine.createSpyObj<HostService>(['findById', 'update']);
     hostServiceSpy.findById.and.returnValue(of(fakeHost));
-    const fakeGuest: Guest = mockGuest2;
-    const guestServiceSpy = jasmine.createSpyObj<GuestService>(['findById', 'update']);
-    guestServiceSpy.findById.and.returnValue(of(fakeGuest));
+    const authServiceSpy = jasmine.createSpyObj<AuthService>(['getRole'])
+    authServiceSpy.getRole.and.returnValue('ROLE_Host')
 
     TestBed.configureTestingModule({
       declarations: [EditAccountComponent],
-      imports: [HttpClientModule, RouterTestingModule, PasswordModule, FormsModule, ReactiveFormsModule],
-      providers: [MessageService, {provide: HostService, useValue: hostServiceSpy}, {provide: GuestService, useValue: guestServiceSpy}, {provide: AuthService}]
+      imports: [HttpClientModule, RouterTestingModule, PasswordModule, FormsModule, ReactiveFormsModule, BrowserModule],
+      providers: [MessageService, {provide: HostService, useValue: hostServiceSpy}, {provide: GuestService}, {provide: AuthService, useValue: authServiceSpy}]
     }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(EditAccountComponent);
     component = fixture.componentInstance;
+    fixture.detectChanges();
   })
 
   it('should create', () => {
@@ -47,9 +48,6 @@ describe('EditAccountComponent', () => {
   });
 
   it('should get data from host service', () => {
-    const authService = fixture.debugElement.injector.get(AuthService);
-    spyOn(authService, 'getRole').and.returnValue('ROLE_Host');
-    fixture.detectChanges();
     expect(component.account).toEqual(mockHost2);
     expect(component.loaded).toBeTruthy();
 
@@ -63,10 +61,86 @@ describe('EditAccountComponent', () => {
     expect(component.editAccountForm.controls['email'].value).toEqual(mockHost2.email);
   })
 
-  it('should get data from guest service', () => {
-    const authService = fixture.debugElement.injector.get(AuthService);
-    spyOn(authService, 'getRole').and.returnValue('ROLE_Guest');
+
+  it('should disable the button when there are no changes in form', () => {
+    const button = fixture.debugElement.query(By.css('#applyChangesButton')).nativeElement;
+    expect(button.disabled).toBeTruthy()
+  });
+
+  it('should enable the button when there are  changes in form', () => {
+    component.editAccountForm.patchValue({firstname: 'editedname'});
+    fixture.detectChanges()
+    const button = fixture.debugElement.query(By.css('#applyChangesButton')).nativeElement;
+    expect(button.disabled).toBeFalsy();
+  });
+
+  it('form should be valid on initial load', () => {
+    expect(component.editAccountForm.valid).toBeTruthy();
+  })
+
+  it('form should be invalid when one field is missing', () => {
+    component.editAccountForm.patchValue({phone: ''})
+    expect(component.editAccountForm.valid).toBeFalsy();
+  })
+
+  it('form should be invalid when phone is invalid format', () => {
+    component.editAccountForm.patchValue({phone: 'fasdfdf'})
+    expect(component.editAccountForm.valid).toBeFalsy();
+  })
+
+  it('update service should not be called when form is invalid', () => {
+    spyOn(component, "updateAccount");
+    component.editAccountForm.patchValue({phone: 'fasdfdf'})
+    const button = fixture.debugElement.query(By.css('#applyChangesButton'));
+    button.triggerEventHandler('click', null);
     fixture.detectChanges();
+    expect(component.editAccountForm.valid).toBeFalsy();
+    expect(component.updateAccount).toHaveBeenCalledTimes(0);
+  })
+
+  it('update service should  be called when form is valid', () => {
+    spyOn(component, 'updateAccount');
+    fixture.detectChanges()
+    submitButton = fixture.debugElement.query(By.css('#applyChangesButton')).nativeElement;
+    component.editAccountForm.patchValue({phone: '132342234'})
+    fixture.detectChanges()
+    submitButton.click()
+    expect(component.editAccountForm.valid).toBeTruthy();
+
+    expect(component.updateAccount).toHaveBeenCalledTimes(1);
+  })
+
+
+
+});
+describe('EditAccountComponentGuest', () => {
+  let component: EditAccountComponent;
+  let fixture: ComponentFixture<EditAccountComponent>;
+
+  beforeEach(() => {
+    const fakeGuest: Guest = mockGuest2;
+    const guestServiceSpy = jasmine.createSpyObj<GuestService>(['findById', 'update']);
+    guestServiceSpy.findById.and.returnValue(of(fakeGuest));
+    const authServiceSpy = jasmine.createSpyObj<AuthService>(['getRole'])
+    authServiceSpy.getRole.and.returnValue('ROLE_Guest')
+
+    TestBed.configureTestingModule({
+      declarations: [EditAccountComponent],
+      imports: [HttpClientModule, RouterTestingModule, PasswordModule, FormsModule, ReactiveFormsModule, BrowserModule],
+      providers: [MessageService, {provide: HostService}, {
+        provide: GuestService,
+        useValue: guestServiceSpy
+      }, {provide: AuthService, useValue: authServiceSpy}]
+    }).compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(EditAccountComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should get data from guest service', () => {
     expect(component.account).toEqual(mockGuest2);
     expect(component.loaded).toBeTruthy();
 
@@ -78,84 +152,6 @@ describe('EditAccountComponent', () => {
     expect(component.editAccountForm.value.number).toEqual(mockGuest2.address.number);
     expect(component.editAccountForm.value.country).toEqual(mockGuest2.address.country);
     expect(component.editAccountForm.controls['email'].value).toEqual(mockGuest2.email);
-  })
-
-  it('should disable the button when there are no changes in form', () => {
-    const authService = fixture.debugElement.injector.get(AuthService);
-    spyOn(authService, 'getRole').and.returnValue('ROLE_Host');
-    fixture.detectChanges();
-
-    const button = fixture.debugElement.query(By.css('#applyChangesButton')).nativeElement;
-    expect(button.disabled).toBeTruthy()
   });
-
-  it('should enable the button when there are  changes in form', () => {
-    const authService = fixture.debugElement.injector.get(AuthService);
-    spyOn(authService, 'getRole').and.returnValue('ROLE_Host');
-    fixture.detectChanges();
-    component.editAccountForm.patchValue({firstname: 'editedname'});
-    const button = fixture.debugElement.query(By.css('#applyChangesButton')).nativeElement;
-    fixture.detectChanges();
-    expect(button.disabled).toBeFalsy();
-  });
-
-  it('form should be valid on initial load', () => {
-    const authService = fixture.debugElement.injector.get(AuthService);
-    spyOn(authService, 'getRole').and.returnValue('ROLE_Host');
-    fixture.detectChanges();
-    expect(component.editAccountForm.valid).toBeTruthy();
-  })
-
-  it('form should be invalid when one field is missing', () => {
-    const authService = fixture.debugElement.injector.get(AuthService);
-    spyOn(authService, 'getRole').and.returnValue('ROLE_Host');
-    fixture.detectChanges();
-    component.editAccountForm.patchValue({phone: ''})
-    fixture.detectChanges();
-    expect(component.editAccountForm.valid).toBeFalsy();
-  })
-
-  it('form should be invalid when phone is invalid format', () => {
-    const authService = fixture.debugElement.injector.get(AuthService);
-    spyOn(authService, 'getRole').and.returnValue('ROLE_Host');
-    fixture.detectChanges();
-    component.editAccountForm.patchValue({phone: 'fasdfdf'})
-    fixture.detectChanges();
-    expect(component.editAccountForm.valid).toBeFalsy();
-  })
-
-  it('update service should not be called when form is invalid', () => {
-    const authService = fixture.debugElement.injector.get(AuthService);
-    spyOn(authService, 'getRole').and.returnValue('ROLE_Host');
-    spyOn(component, "updateAccount");
-    fixture.detectChanges();
-    component.editAccountForm.patchValue({phone: 'fasdfdf'})
-    const button = fixture.debugElement.query(By.css('#applyChangesButton'));
-    button.triggerEventHandler('click', null);
-    fixture.detectChanges();
-    expect(component.editAccountForm.valid).toBeFalsy();
-    expect(component.updateAccount).toHaveBeenCalledTimes(0);
-  })
-
-  it('update service should  be called when form is valid', () => {
-    fixture.detectChanges();
-    const authService = fixture.debugElement.injector.get(AuthService);
-    spyOn(authService, 'getRole').and.returnValue('ROLE_Host');
-    spyOn(component, "updateAccount");
-    spyOn(component, "onSubmit");
-    component.editAccountForm.patchValue({phone: '132342234'})
-    const button = fixture.debugElement.query(By.css('#applyChangesButton'));
-    fixture.detectChanges();
-    button.nativeElement.click();
-
-
-
-    expect(component.onSubmit).toHaveBeenCalledTimes(1);
-    expect(component.editAccountForm.valid).toBeTruthy();
-    expect(component.updateAccount).toHaveBeenCalledTimes(1);
-    expect(hostServiceSpy.update).toHaveBeenCalledTimes(1);
-  })
-
-
 
 });

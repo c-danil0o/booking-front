@@ -2,9 +2,7 @@
 
 
 
-// @ts-ignore
 const startDate= new Date(2024,2,10);
-// @ts-ignore
 const endDate = new Date(2024,2,15);
 
 const mockAvailabilityPrice ={

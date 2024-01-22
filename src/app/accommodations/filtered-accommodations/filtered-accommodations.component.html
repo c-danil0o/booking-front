@@ -47,7 +47,7 @@
             <div class="price-filter">
             <h5>Price range from {{rangeValues[0]}} to {{rangeValues[1]}}</h5>
             <p-slider [(ngModel)]="rangeValues" [range]="true" (onSlideEnd)="onPriceRangeChange()" [min]="10"
-                      [max]="200"></p-slider>
+                      [max]="400"></p-slider>
             <p>{{ rangeValues[0] }} - {{ rangeValues[1] }}</p></div>
       </div>
 
