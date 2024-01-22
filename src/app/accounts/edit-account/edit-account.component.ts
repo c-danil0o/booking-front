@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 import { HostService } from '../services/host.service';
@@ -17,7 +17,7 @@ import {MessageService} from "primeng/api";
   templateUrl: './edit-account.component.html',
   styleUrls: ['./edit-account.component.css']
 })
-export class EditAccountComponent {
+export class EditAccountComponent implements OnInit{
   account: any;
   editAccountForm: FormGroup;
   changePasswordForm: FormGroup;
@@ -46,6 +46,9 @@ export class EditAccountComponent {
         });
       }
     });
+  }
+  printff(): void{
+    console.log("jebo te alah")
   }
 
   private initializeEditAccountForm(): void {
@@ -126,8 +129,7 @@ export class EditAccountComponent {
     }
 
   }
-  onSubmit(): void {
-    console.log("clicked submit")
+  onFormSubmit(): void {
     if(this.editAccountForm.valid) {
       this.updateAccount();
     } else {
@@ -250,7 +252,6 @@ export class EditAccountComponent {
       country: this.account.address.country
     })
     this.editAccountForm.valueChanges.subscribe(() => {
-      console.log("changed")
       this.formChanged = true;
     })
   }

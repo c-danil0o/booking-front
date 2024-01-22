@@ -28,7 +28,7 @@ export class FilteredAccommodationsComponent {
   selectedTypes: string[] = [];
   amenities: string[] = ["TV", "Parking", "AC", "Fridge", "Lift", "Pet Friendly", "Kitchen"];
   selected_amenities: string[] = [];
-  rangeValues: number[] = [10,200];
+  rangeValues: number[] = [10,400];
   place: string;
   startDate: Date;
   endDate: Date;
@@ -220,7 +220,7 @@ export class FilteredAccommodationsComponent {
       if (price>=this.rangeValues[0] && price <= this.rangeValues[1]){
         newAccommodatins.push(this.filteredAccommodations[i]);
       }
-      else if (this.rangeValues[1]==200 && price >200)
+      else if (this.rangeValues[1]==400 && price >400)
         newAccommodatins.push(this.filteredAccommodations[i]);
 
     }
